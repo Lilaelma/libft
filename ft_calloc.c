@@ -16,7 +16,7 @@
 void	*ft_calloc(size_t nmemb, size_t size)
 {
 	char	*array;
-	int	nb;
+	int		nb;
 
 	nb = nmemb * size;
 	if (nmemb == 18446744073709551615UL || size == 18446744073709551615UL)

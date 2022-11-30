@@ -13,56 +13,60 @@
 #include "libft.h"
 #include <stdlib.h>
 
-static int	get_nb_word(char const *s, char c)
+static int	nbr_word(char const *str, char c)
 {
 	int	i;
-	int	nb_mot;
-	int	flag;
-	int	save;
-
-	i = 0;
-	nb_mot = 0;
-	while (s[i])
-	{
-		if (s[i] == c)
-		{
-			flag = 0;
-			save = 0;
-		}
-		if (s[i] != c)
-			flag = 1;
-		if (flag > save)
-		{
-			nb_mot++;
-			save = 1;
-		}
-		i++;
-	}
-	return (nb_mot);
-}
-
-static int	get_len_word(const char *s, char c)
-{
 	int	len;
 
+	i = 0;
 	len = 0;
-	while (s[len] != c && s[len])
+	while (str[i])
+	{
+		if (str[i] == c && i != 0 && str[i - 1] != c)
+			len++;
+		i++;
+	}
+	if (i != 0 && str[i - 1] != c)
 		len++;
 	return (len);
 }
 
-static char	*get_word(char *dest, const char *src, int len)
+static char	**ft_protec(char const *s, char c)
 {
-	int	i;
+	char	**res;
+
+	if (!s)
+		return (NULL);
+	res = malloc((nbr_word((char *)s, c) + 1) * sizeof(char *));
+	if (!res)
+		return (NULL);
+	return (res);
+}
+
+static char	*ft_strdup_split(const char *str, char c)
+{
+	int		i;
+	int		j;
+	char	*word;
 
 	i = 0;
-	while (i < len)
-	{
-		dest[i] = src[i];
+	j = 0;
+	while (str[i] && str[i] != c)
 		i++;
+	word = malloc(sizeof (char) * (i + 1));
+	if (!word)
+		return (NULL);
+	i = 0;
+	while (str[i] == c && str[i])
+		i++;
+	while (str[i] != c && str[i])
+	{
+		word[j] = str[i];
+		i++;
+		j++;
 	}
-	dest[len] = '\0';
-	return (dest);
+	word[j] = '\0';
+	return (word);
 }
 
 static void	*free_tab(char **tab)
@@ -80,29 +84,28 @@ static void	*free_tab(char **tab)
 
 char	**ft_split(char const *s, char c)
 {
-	char	**tab;
-	size_t	nb_words;
-	size_t	i;
-	size_t	j;
+	int		i;
+	int		j;
+	char	**res;
 
-	if (!s)
-		return (0);
 	i = 0;
 	j = 0;
-	nb_words = get_nb_word(s, c);
-	if (!(tab = (char **)malloc(sizeof(char *) * (nb_words + 1))))
+	res = ft_protec(s, c);
+	if (!res)
 		return (NULL);
-	while (j < nb_words && tab)
+	while (s[i] && s[i] == c)
+		i++;
+	while (s[i])
 	{
-		while (s[i] == c && s[i])
-			i++;
-		if (!(tab[j] = (char *)malloc(get_len_word(&s[i], c) + 1)))
-			return (free_tab(tab));
-		get_word(tab[j], &s[i], get_len_word(&s[i], c));
+		res[j] = ft_strdup_split(&s[i], c);
+		if (!res[j])
+			return (free_tab(res));
 		while (s[i] != c && s[i])
+			i++;
+		while (s[i] && s[i] == c)
 			i++;
 		j++;
 	}
-	tab[j] = NULL;
-	return (tab);
+	res[nbr_word((char *)s, c)] = 0;
+	return (res);
 }
